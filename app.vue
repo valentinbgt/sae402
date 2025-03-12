@@ -1,6 +1,6 @@
 <template>
   <div class="flex items-center justify-center min-h-screen bg-gray-100">
-    <img :src="'/img/' + imageList[index]" />
+    <img id="mainImage" :src="'/img/' + imageList[index]" />
   </div>
 </template>
 
@@ -21,6 +21,18 @@ const imageList = {
 
 onMounted(() => {
   window.addEventListener("keydown", handleKeyPress);
+
+  const mainImage = document.getElementById("mainImage");
+
+  mainImage.addEventListener("click", () => {
+    if (!document.fullscreenElement) {
+      mainImage.requestFullscreen().catch((err) => {
+        console.log(`Error attempting to enable fullscreen: ${err.message}`);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  });
 });
 
 onUnmounted(() => {

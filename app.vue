@@ -37,6 +37,8 @@ const imageList = {
   7: "7.png",
   8: "8.png",
   9: "9.png",
+  10: "10.png",
+  11: "11.png",
 };
 
 const tryNext = () => {
@@ -84,9 +86,9 @@ onUnmounted(() => {
 
 <style>
 .next-cursor {
-  cursor: url("/icons/MaterialSymbolsArrowForward.svg") 0 0, auto;
+  cursor: url("/icons/arrow_forward.png") 0 0, auto;
 }
 .prev-cursor {
-  cursor: url("/icons/MaterialSymbolsArrowBack.svg") 0 0, auto;
+  cursor: url("/icons/arrow_back.png") 0 0, auto;
 }
 </style>

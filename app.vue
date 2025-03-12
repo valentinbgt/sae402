@@ -18,4 +18,36 @@ const imageList = {
   8: "8.png",
   9: "9.png",
 };
+
+onMounted(() => {
+  window.addEventListener("keydown", handleKeyPress);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("keydown", handleKeyPress);
+});
+
+const handleKeyPress = (event) => {
+  //console.log("Key pressed:", event.key);
+
+  if (event.key == "ArrowLeft") {
+    tryNext();
+  }
+
+  if (event.key == "ArrowRight") {
+    tryPrevious();
+  }
+
+  function tryNext() {
+    if (index.value > 1) {
+      index.value--;
+    }
+  }
+
+  function tryPrevious() {
+    if (index.value < Object.keys(imageList).length) {
+      index.value++;
+    }
+  }
+};
 </script>

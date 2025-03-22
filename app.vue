@@ -75,6 +75,20 @@ const handleKeyPress = (event) => {
   if (event.key === "ArrowRight") {
     tryNext();
   }
+  if (event.key === "f" || event.key === "F") {
+    toggleFullscreen();
+  }
+};
+
+const toggleFullscreen = () => {
+  const container = document.getElementById("container");
+  if (!document.fullscreenElement) {
+    container.requestFullscreen().catch((err) => {
+      console.log(`Error attempting to enable fullscreen: ${err.message}`);
+    });
+  } else {
+    document.exitFullscreen();
+  }
 };
 
 onMounted(() => {

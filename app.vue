@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center justify-center h-screen bg-gray-700">
+  <div class="flex items-center justify-center h-screen bg-gray-900">
     <div
       id="container"
       class="h-3/5 aspect-square flex items-center justify-center relative"

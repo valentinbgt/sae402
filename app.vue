@@ -2,11 +2,11 @@
   <div class="flex items-center justify-center h-screen bg-gray-700">
     <div
       id="container"
-      class="w-3/5 aspect-square bg-blue-700 flex items-center justify-center relative"
+      class="h-3/5 aspect-square flex items-center justify-center relative"
       style="max-width: 900px; min-width: 700px"
     >
       <img id="mainImage" :src="'/img/' + imageList[index]" class="h-full" />
-      <div class="absolute w-full h-full">
+      <div class="absolute h-full aspect-square">
         <div
           @click="tryPrevious()"
           class="h-full w-1/2 inline-block prev-cursor"

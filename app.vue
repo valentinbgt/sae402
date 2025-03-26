@@ -2,9 +2,14 @@
   <div class="flex items-center justify-center h-screen bg-gray-900 relative">
     <img
       src="/img/perso1_decor.png"
-      class="absolute bottom-0 right-0 w-52"
+      class="absolute bottom-0 right-0 w-80"
       alt=""
     />
+
+    <div class="absolute bottom-4 left-0 right-0 flex justify-center">
+      <img src="/img/titre_bde.png" class="w-60" alt="" />
+    </div>
+
     <div
       id="container"
       class="h-3/5 aspect-square flex items-center justify-center relative"

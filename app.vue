@@ -1,5 +1,10 @@
 <template>
-  <div class="flex items-center justify-center h-screen bg-gray-900">
+  <div class="flex items-center justify-center h-screen bg-gray-900 relative">
+    <img
+      src="/img/perso1_decor.png"
+      class="absolute bottom-0 right-0 w-52"
+      alt=""
+    />
     <div
       id="container"
       class="h-3/5 aspect-square flex items-center justify-center relative"
@@ -26,6 +31,7 @@
 import { ref, onMounted, onUnmounted } from "vue";
 
 const index = ref(1);
+const preloadedImages = ref([]);
 
 const imageList = {
   1: "1.png",
@@ -115,6 +121,14 @@ const imageList = {
   85: "85.png",
 };
 
+const preloadImages = () => {
+  for (const key in imageList) {
+    const img = new Image();
+    img.src = `/img/${imageList[key]}`;
+    preloadedImages.value.push(img);
+  }
+};
+
 const tryNext = () => {
   if (index.value < Object.keys(imageList).length) {
     index.value++;
@@ -151,6 +165,8 @@ const toggleFullscreen = () => {
 };
 
 onMounted(() => {
+  preloadImages();
+
   window.addEventListener("keydown", handleKeyPress);
 
   const container = document.getElementById("container");

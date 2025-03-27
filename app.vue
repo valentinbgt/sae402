@@ -45,6 +45,12 @@ import { ref, onMounted, onUnmounted } from "vue";
 const index = ref(1);
 const preloadedImages = ref([]);
 
+const soundList = {
+  45: "pacman.mp3",
+  46: "pacman.mp3",
+  47: "pacman.mp3",
+};
+
 const imageList = {
   1: "1.png",
   2: "2.png",
@@ -154,6 +160,11 @@ const preloadImages = () => {
 const tryNext = () => {
   if (index.value < Object.keys(imageList).length) {
     index.value++;
+    // Play sound if there's one associated with this image
+    if (soundList[index.value]) {
+      const audio = new Audio(`/sounds/${soundList[index.value]}`);
+      audio.play();
+    }
   }
 };
 

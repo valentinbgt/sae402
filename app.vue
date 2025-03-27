@@ -231,17 +231,21 @@ const playMusic = (musicFile) => {
   newMusic.loop = true;
   newMusic.volume = 0; // Start at 0 volume for fade in effect
 
-  // Apply current volume setting - music plays at 50% of master volume
+  // Apply current volume setting - music plays at multiplier of master volume
   const targetVolume = volume.value * MUSIC_VOLUME_MULTIPLIER;
 
-  // If there's already music playing, fade it out
+  // Start playing the new music immediately
+  newMusic.play();
+
+  // If there's already music playing, fade it out while fading in the new one simultaneously
   if (currentMusic.value) {
     fadeOut(currentMusic.value);
+    // Start fading in the new music immediately
+    fadeIn(newMusic, targetVolume);
+  } else {
+    // If no music was playing, just fade in the new one
+    fadeIn(newMusic, targetVolume);
   }
-
-  // Start playing the new music and fade it in
-  newMusic.play();
-  fadeIn(newMusic, targetVolume);
 
   // Update the current music reference
   currentMusic.value = newMusic;
@@ -251,29 +255,40 @@ const fadeIn = (audioElement, targetVolume) => {
   let currentVol = 0;
   audioElement.volume = currentVol;
 
+  // Calculate step size for a 2-second fade (20 steps)
+  const stepSize = targetVolume / 20;
+  const stepTime = 100; // 100ms per step = 2 seconds total
+
   const fadeInterval = setInterval(() => {
-    currentVol += 0.05; // Increase by 5% each step
+    currentVol += stepSize;
     if (currentVol >= targetVolume) {
       currentVol = targetVolume;
       clearInterval(fadeInterval);
     }
     audioElement.volume = currentVol;
-  }, 100); // Completes in 2 seconds (100ms * 20 steps)
+  }, stepTime);
 };
 
 const fadeOut = (audioElement) => {
   let currentVol = audioElement.volume;
 
-  const fadeInterval = setInterval(() => {
-    currentVol -= 0.05; // Decrease by 5% each step
-    if (currentVol <= 0) {
-      currentVol = 0;
-      clearInterval(fadeInterval);
-      audioElement.pause();
-      audioElement.currentTime = 0;
-    }
-    audioElement.volume = currentVol;
-  }, 100); // Completes in 2 seconds (100ms * 20 steps)
+  // Calculate step size for a 2-second fade (20 steps)
+  const stepSize = currentVol / 20;
+  const stepTime = 100; // 100ms per step = 2 seconds total
+
+  return new Promise((resolve) => {
+    const fadeInterval = setInterval(() => {
+      currentVol -= stepSize;
+      if (currentVol <= 0) {
+        currentVol = 0;
+        clearInterval(fadeInterval);
+        audioElement.pause();
+        audioElement.currentTime = 0;
+        resolve();
+      }
+      audioElement.volume = currentVol;
+    }, stepTime);
+  });
 };
 
 // Update the volume control for all audio
@@ -290,10 +305,7 @@ const checkAndUpdateMusic = () => {
     const newMusicFile = musicList[index.value];
 
     // If there's no current music playing or it's a different track, play the new music
-    if (
-      !currentMusic.value ||
-      currentMusic.value.src.split("/").pop() !== newMusicFile
-    ) {
+    if (!currentMusic.value || !currentMusic.value.src.includes(newMusicFile)) {
       playMusic(newMusicFile);
     }
     // If it's the same music, no need to restart it

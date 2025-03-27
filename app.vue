@@ -131,6 +131,16 @@ const imageList = {
   83: "83.png",
   84: "84.png",
   85: "85.png",
+  86: "86.png",
+  87: "87.png",
+  88: "88.png",
+  89: "89.png",
+  90: "90.png",
+  91: "91.png",
+  92: "92.png",
+  93: "93.png",
+  94: "94.png",
+  95: "95.png",
 };
 
 const preloadImages = () => {

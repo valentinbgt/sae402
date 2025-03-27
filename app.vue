@@ -60,6 +60,7 @@ const index = ref(1);
 const preloadedImages = ref([]);
 const volume = ref(1); // Default volume is 100%
 const currentMusic = ref(null);
+const MUSIC_VOLUME_MULTIPLIER = 0.3; // Music plays at 50% of master volume
 
 const soundList = {
   45: "pacman.mp3",
@@ -69,7 +70,8 @@ const soundList = {
 
 const musicList = {
   1: "main_music.mp3",
-  2: "main_music.mp3",
+  2: "course_intro.mp3",
+  3: "mario_kart_stadium.mp3",
 };
 
 const imageList = {
@@ -184,6 +186,8 @@ const tryNext = () => {
     // Play sound if there's one associated with this image
     if (soundList[index.value]) {
       const audio = new Audio(`/sounds/${soundList[index.value]}`);
+      // Apply master volume control to sounds (100% of master volume)
+      audio.volume = volume.value;
       audio.play();
     }
     checkAndUpdateMusic();
@@ -227,8 +231,8 @@ const playMusic = (musicFile) => {
   newMusic.loop = true;
   newMusic.volume = 0; // Start at 0 volume for fade in effect
 
-  // Apply current volume setting
-  const targetVolume = volume.value;
+  // Apply current volume setting - music plays at 50% of master volume
+  const targetVolume = volume.value * MUSIC_VOLUME_MULTIPLIER;
 
   // If there's already music playing, fade it out
   if (currentMusic.value) {
@@ -275,14 +279,24 @@ const fadeOut = (audioElement) => {
 // Update the volume control for all audio
 const updateVolume = () => {
   if (currentMusic.value) {
-    currentMusic.value.volume = volume.value;
+    // Music plays at 50% of master volume
+    currentMusic.value.volume = volume.value * MUSIC_VOLUME_MULTIPLIER;
   }
 };
 
 // Check if we need to change music for the current image
 const checkAndUpdateMusic = () => {
   if (musicList[index.value]) {
-    playMusic(musicList[index.value]);
+    const newMusicFile = musicList[index.value];
+
+    // If there's no current music playing or it's a different track, play the new music
+    if (
+      !currentMusic.value ||
+      currentMusic.value.src.split("/").pop() !== newMusicFile
+    ) {
+      playMusic(newMusicFile);
+    }
+    // If it's the same music, no need to restart it
   }
 };
 

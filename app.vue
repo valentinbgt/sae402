@@ -2,12 +2,19 @@
   <div class="flex items-center justify-center h-screen bg-gray-900 relative">
     <img
       src="/img/perso1_decor.png"
+      class="absolute top-0 left-0 w-80"
+      hidden
+      alt=""
+    />
+
+    <img
+      src="/img/perso1_decor.png"
       class="absolute bottom-0 right-0 w-80"
       alt=""
     />
 
     <div class="absolute bottom-4 left-0 right-0 flex justify-center">
-      <img src="/img/titre_bde.png" class="w-60" alt="" />
+      <img src="/img/titre_bd.png" class="w-96" alt="" />
     </div>
 
     <div

@@ -1,5 +1,19 @@
 <template>
   <div class="flex items-center justify-center h-screen bg-gray-900 relative">
+    <!-- Volume control in top right -->
+    <div class="absolute top-4 right-4 flex items-center">
+      <span class="text-white mr-2">Volume</span>
+      <input
+        type="range"
+        min="0"
+        max="1"
+        step="0.01"
+        v-model="volume"
+        @input="updateVolume"
+        class="w-32"
+      />
+    </div>
+
     <img
       src="/img/perso1_decor.png"
       class="absolute top-0 left-0 w-80"
@@ -44,11 +58,18 @@ import { ref, onMounted, onUnmounted } from "vue";
 
 const index = ref(1);
 const preloadedImages = ref([]);
+const volume = ref(1); // Default volume is 100%
+const currentMusic = ref(null);
 
 const soundList = {
   45: "pacman.mp3",
   46: "pacman.mp3",
   47: "pacman.mp3",
+};
+
+const musicList = {
+  1: "main_music.mp3",
+  2: "main_music.mp3",
 };
 
 const imageList = {
@@ -165,12 +186,14 @@ const tryNext = () => {
       const audio = new Audio(`/sounds/${soundList[index.value]}`);
       audio.play();
     }
+    checkAndUpdateMusic();
   }
 };
 
 const tryPrevious = () => {
   if (index.value > 1) {
     index.value--;
+    checkAndUpdateMusic();
   }
 };
 
@@ -197,6 +220,72 @@ const toggleFullscreen = () => {
   }
 };
 
+// Music handling functions
+const playMusic = (musicFile) => {
+  // Create a new audio element for the music
+  const newMusic = new Audio(`/sounds/${musicFile}`);
+  newMusic.loop = true;
+  newMusic.volume = 0; // Start at 0 volume for fade in effect
+
+  // Apply current volume setting
+  const targetVolume = volume.value;
+
+  // If there's already music playing, fade it out
+  if (currentMusic.value) {
+    fadeOut(currentMusic.value);
+  }
+
+  // Start playing the new music and fade it in
+  newMusic.play();
+  fadeIn(newMusic, targetVolume);
+
+  // Update the current music reference
+  currentMusic.value = newMusic;
+};
+
+const fadeIn = (audioElement, targetVolume) => {
+  let currentVol = 0;
+  audioElement.volume = currentVol;
+
+  const fadeInterval = setInterval(() => {
+    currentVol += 0.05; // Increase by 5% each step
+    if (currentVol >= targetVolume) {
+      currentVol = targetVolume;
+      clearInterval(fadeInterval);
+    }
+    audioElement.volume = currentVol;
+  }, 100); // Completes in 2 seconds (100ms * 20 steps)
+};
+
+const fadeOut = (audioElement) => {
+  let currentVol = audioElement.volume;
+
+  const fadeInterval = setInterval(() => {
+    currentVol -= 0.05; // Decrease by 5% each step
+    if (currentVol <= 0) {
+      currentVol = 0;
+      clearInterval(fadeInterval);
+      audioElement.pause();
+      audioElement.currentTime = 0;
+    }
+    audioElement.volume = currentVol;
+  }, 100); // Completes in 2 seconds (100ms * 20 steps)
+};
+
+// Update the volume control for all audio
+const updateVolume = () => {
+  if (currentMusic.value) {
+    currentMusic.value.volume = volume.value;
+  }
+};
+
+// Check if we need to change music for the current image
+const checkAndUpdateMusic = () => {
+  if (musicList[index.value]) {
+    playMusic(musicList[index.value]);
+  }
+};
+
 onMounted(() => {
   preloadImages();
 
@@ -214,6 +303,7 @@ onMounted(() => {
       document.exitFullscreen();
     }
   });
+  checkAndUpdateMusic();
 });
 
 onUnmounted(() => {

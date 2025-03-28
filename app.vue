@@ -190,10 +190,11 @@ const soundList = {
   83: "hum.ogg",
   87: "eh.ogg",
   88: "wilhelm.ogg",
-  r_key: "rot.ogg",
+  b_key: "rot.ogg",
 };
 
 const musicList = {
+  0: "STOP",
   1: "main_music.ogg",
   33: "main_music.ogg",
   34: "STOP",
@@ -318,9 +319,42 @@ const toggleMusic = () => {
   if (musicMuted.value && currentMusic.value) {
     fadeOut(currentMusic.value);
     currentMusic.value = null;
-  } else if (!musicMuted.value && musicList[index.value]) {
-    playMusic(musicList[index.value]);
+  } else if (!musicMuted.value) {
+    // Find and play the nearest music track when turning music back on
+    const nearestMusicTrack = findNearestMusicTrack();
+    if (nearestMusicTrack) {
+      playMusic(nearestMusicTrack);
+    }
   }
+};
+
+const findNearestMusicTrack = () => {
+  // If current index has music, use it
+  if (musicList[index.value] && musicList[index.value] !== "STOP") {
+    return musicList[index.value];
+  }
+
+  // Convert music list keys to numbers for comparison
+  const musicPoints = Object.keys(musicList)
+    .filter((key) => musicList[key] !== "STOP")
+    .map((key) => parseInt(key, 10))
+    .filter((key) => !isNaN(key));
+
+  if (musicPoints.length === 0) return null;
+
+  // Find the closest music point to the current index
+  let closestPoint = musicPoints[0];
+  let minDistance = Math.abs(index.value - closestPoint);
+
+  for (const point of musicPoints) {
+    const distance = Math.abs(index.value - point);
+    if (distance < minDistance) {
+      minDistance = distance;
+      closestPoint = point;
+    }
+  }
+
+  return musicList[closestPoint];
 };
 
 const preloadResources = async () => {
@@ -447,9 +481,9 @@ const handleKeyPress = (event) => {
   if (event.key === "f" || event.key === "F") {
     toggleFullscreen();
   }
-  if (event.key === "r" || event.key === "R") {
+  if (event.key === "b" || event.key === "B") {
     if (gameStarted.value) {
-      const audio = new Audio(`/sounds/${soundList["r_key"]}`);
+      const audio = new Audio(`/sounds/${soundList["b_key"]}`);
       audio.volume = volume.value;
       audio.play();
     }
@@ -532,8 +566,23 @@ const checkAndUpdateMusic = () => {
 
   if (musicList[index.value]) {
     const newMusicFile = musicList[index.value];
-    if (!currentMusic.value || !currentMusic.value.src.includes(newMusicFile)) {
+    if (newMusicFile === "STOP") {
+      if (currentMusic.value) {
+        fadeOut(currentMusic.value);
+        currentMusic.value = null;
+      }
+    } else if (
+      !currentMusic.value ||
+      !currentMusic.value.src.includes(newMusicFile)
+    ) {
       playMusic(newMusicFile);
+    }
+  } else if (!currentMusic.value) {
+    // If there's no music at the current index and no music is playing,
+    // find and play the nearest appropriate track
+    const nearestMusicTrack = findNearestMusicTrack();
+    if (nearestMusicTrack) {
+      playMusic(nearestMusicTrack);
     }
   }
 };

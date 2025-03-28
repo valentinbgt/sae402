@@ -22,7 +22,7 @@
 
     <img
       src="/img/perso1_decor.png"
-      class="absolute bottom-0 right-0 w-80"
+      class="absolute bottom-0 right-0 w-60 md:w-80"
       alt=""
     />
 

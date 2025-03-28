@@ -123,7 +123,7 @@ if (process.client) {
   }
 }
 const currentMusic = ref(null);
-const MUSIC_VOLUME_MULTIPLIER = 0.2; // Music plays at 30% of master volume
+const MUSIC_VOLUME_MULTIPLIER = 0.4; // Music plays at 30% of master volume
 
 // Loading screen variables
 const loading = ref(true);
@@ -156,8 +156,8 @@ const soundList = {
 
 const musicList = {
   1: "main_music.mp3",
-  2: "course_intro.mp3",
-  3: "mario_kart_stadium.mp3",
+  35: "herobrine.mp3",
+  68: "dernier_boss.mp3",
 };
 
 const imageList = {

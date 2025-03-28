@@ -102,9 +102,17 @@ import { ref, onMounted, onUnmounted, watch, nextTick } from "vue";
 const index = ref(1);
 const preloadedImages = ref([]);
 const preloadedAudio = ref([]);
-const volume = ref(1); // Default volume is 100%
+// Initialize volume with proper browser check
+const volume = ref(1); // Default to 1
+// Check if code is running in browser before accessing localStorage
+if (process.client) {
+  const savedVolume = localStorage.getItem("masterVolume");
+  if (savedVolume !== null) {
+    volume.value = parseFloat(savedVolume);
+  }
+}
 const currentMusic = ref(null);
-const MUSIC_VOLUME_MULTIPLIER = 0.3; // Music plays at 50% of master volume
+const MUSIC_VOLUME_MULTIPLIER = 0.3; // Music plays at 30% of master volume
 
 // Loading screen variables
 const loading = ref(true);
@@ -460,6 +468,10 @@ const updateVolume = () => {
   if (currentMusic.value) {
     // Music plays at 50% of master volume
     currentMusic.value.volume = volume.value * MUSIC_VOLUME_MULTIPLIER;
+  }
+  // Store the updated volume in localStorage with browser check
+  if (process.client) {
+    localStorage.setItem("masterVolume", volume.value);
   }
 };
 

@@ -139,7 +139,7 @@ const soundList = {
   13: "corbeau.ogg",
   19: "pof.ogg",
   25: "pof.ogg",
-  27: "pof.ogg",
+  27: "ki.ogg",
   28: "ka.ogg",
   29: "me.ogg",
   30: "ha.ogg",
@@ -152,6 +152,7 @@ const soundList = {
   47: "pacman.ogg",
   63: "pof.ogg",
   76: "pof.ogg",
+  83: "hum.ogg",
   r_key: "rot.ogg",
 };
 

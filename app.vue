@@ -103,6 +103,11 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, watch, nextTick } from "vue";
+// Define the page title
+useHead({
+  title: "Metaring",
+});
+
 const index = ref(1);
 const preloadedImages = ref([]);
 const preloadedAudio = ref([]);

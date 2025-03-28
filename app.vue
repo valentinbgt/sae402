@@ -163,6 +163,8 @@ const soundList = {
   47: "pacman.ogg",
   49: "criquets.ogg",
   53: "glurps.ogg",
+  56: "fall_cerise.ogg",
+  57: "drop_cerise.ogg",
   62: "crounch.ogg",
   63: "pof.ogg",
   67: "boss_spawn.ogg",

@@ -123,7 +123,7 @@ if (process.client) {
   }
 }
 const currentMusic = ref(null);
-const MUSIC_VOLUME_MULTIPLIER = 0.4; // Music plays at 30% of master volume
+const MUSIC_VOLUME_MULTIPLIER = 0.6; // Music plays at 30% of master volume
 
 // Loading screen variables
 const loading = ref(true);
@@ -156,6 +156,7 @@ const soundList = {
 
 const musicList = {
   1: "main_music.mp3",
+  34: "STOP",
   35: "herobrine.mp3",
   68: "dernier_boss.mp3",
 };
@@ -453,9 +454,9 @@ const playMusic = (musicFile) => {
 const fadeIn = (audioElement, targetVolume) => {
   let currentVol = 0;
   audioElement.volume = currentVol;
-  // Calculate step size for a 2-second fade (20 steps)
-  const stepSize = targetVolume / 20;
-  const stepTime = 100; // 100ms per step = 2 seconds total
+  // Calculate step size for a 1-second fade (10 steps)
+  const stepSize = targetVolume / 10;
+  const stepTime = 100; // 100ms per step = 1 second total
   const fadeInterval = setInterval(() => {
     currentVol += stepSize;
     if (currentVol >= targetVolume) {
@@ -468,9 +469,9 @@ const fadeIn = (audioElement, targetVolume) => {
 
 const fadeOut = (audioElement) => {
   let currentVol = audioElement.volume;
-  // Calculate step size for a 2-second fade (20 steps)
-  const stepSize = currentVol / 20;
-  const stepTime = 100; // 100ms per step = 2 seconds total
+  // Calculate step size for a 1-second fade (10 steps)
+  const stepSize = currentVol / 10;
+  const stepTime = 100; // 100ms per step = 1 second total
   return new Promise((resolve) => {
     const fadeInterval = setInterval(() => {
       currentVol -= stepSize;

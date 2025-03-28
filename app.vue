@@ -15,9 +15,8 @@
     </div>
 
     <img
-      src="/img/perso1_decor.png"
-      class="absolute top-0 left-0 w-80"
-      hidden
+      src="/img/pierre_deter.png"
+      class="absolute bottom-0 left-0 w-60"
       alt=""
     />
 

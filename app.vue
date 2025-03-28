@@ -385,7 +385,7 @@ const preloadResources = async () => {
 };
 
 const tryNext = () => {
-  if (index.value < Object.keys(imageList).length) {
+  if (index.value < Object.keys(imageList).length - 1) {
     index.value++;
     if (gameStarted.value && soundList[index.value]) {
       const audio = new Audio(`/sounds/${soundList[index.value]}`);

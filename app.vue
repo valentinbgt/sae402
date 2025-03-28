@@ -156,19 +156,26 @@ const soundList = {
   53: "glurps.ogg",
   62: "crounch.ogg",
   63: "pof.ogg",
+  67: "boss_spawn.ogg",
   74: "transfo1.ogg",
   75: "transfo2.ogg",
   76: "transfo3.ogg",
   77: "pof.ogg",
   83: "hum.ogg",
+  88: "wilhelm.ogg",
   r_key: "rot.ogg",
 };
 
 const musicList = {
   1: "main_music.mp3",
+  33: "main_music.mp3",
   34: "STOP",
   35: "herobrine.mp3",
+  66: "herobrine.mp3",
+  67: "STOP",
   68: "dernier_boss.mp3",
+  82: "dernier_boss.mp3",
+  83: "fin.mp3",
 };
 
 const imageList = {

@@ -5,7 +5,9 @@
       v-if="loading"
       class="fixed inset-0 bg-gray-900 flex flex-col items-center justify-center z-50"
     >
-      <h1 class="text-4xl text-white mb-6 font-bold">Loading...</h1>
+      <h1 class="text-4xl text-white mb-6 font-bold">
+        Chargement de l'aventure
+      </h1>
       <div class="w-64 h-4 bg-gray-700 rounded-full overflow-hidden">
         <div
           class="h-full bg-blue-500 transition-all duration-300"
@@ -26,10 +28,10 @@
       @click="startGame"
     >
       <h1 class="text-4xl text-white mb-6 font-bold">
-        Click on the screen to play
+        Clique sur l'écran pour rejoindre l'aventure
       </h1>
       <div class="text-white text-opacity-70 text-xl mt-4 animate-pulse">
-        Click anywhere to continue
+        Cliquez n'importe où pour commencer
       </div>
     </div>
 
@@ -113,9 +115,16 @@ const gameStarted = ref(false);
 
 // Resources to preload
 const soundList = {
+  19: "pof.ogg",
+  25: "pof.ogg",
+  27: "pof.ogg",
+  34: "pof.ogg",
+  42: "pof.ogg",
   45: "pacman.mp3",
   46: "pacman.mp3",
   47: "pacman.mp3",
+  63: "pof.ogg",
+  76: "pof.ogg",
 };
 
 const musicList = {

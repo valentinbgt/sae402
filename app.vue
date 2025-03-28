@@ -123,7 +123,7 @@ if (process.client) {
   }
 }
 const currentMusic = ref(null);
-const MUSIC_VOLUME_MULTIPLIER = 0.3; // Music plays at 30% of master volume
+const MUSIC_VOLUME_MULTIPLIER = 0.2; // Music plays at 30% of master volume
 
 // Loading screen variables
 const loading = ref(true);
@@ -134,7 +134,9 @@ const gameStarted = ref(false);
 
 // Resources to preload
 const soundList = {
+  2: "piouf.ogg",
   5: "coup_de_poing.ogg",
+  13: "corbeau.ogg",
   19: "pof.ogg",
   25: "pof.ogg",
   27: "pof.ogg",
@@ -143,11 +145,11 @@ const soundList = {
   30: "ha.ogg",
   31: "me2.ogg",
   32: "haaa.ogg",
-  34: "pof.ogg",
+  34: "boss_spawn.ogg",
   42: "pof.ogg",
-  45: "pacman.mp3",
-  46: "pacman.mp3",
-  47: "pacman.mp3",
+  45: "pacman.ogg",
+  46: "pacman.ogg",
+  47: "pacman.ogg",
   63: "pof.ogg",
   76: "pof.ogg",
 };

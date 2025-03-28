@@ -152,6 +152,7 @@ const soundList = {
   47: "pacman.ogg",
   63: "pof.ogg",
   76: "pof.ogg",
+  "r_key": "rot.ogg",
 };
 
 const musicList = {
@@ -411,6 +412,14 @@ const handleKeyPress = (event) => {
   }
   if (event.key === "f" || event.key === "F") {
     toggleFullscreen();
+  }
+  if (event.key === "r" || event.key === "R") {
+    // Play rot.ogg sound when R is pressed
+    if (gameStarted.value) {
+      const audio = new Audio(`/sounds/${soundList["r_key"]}`);
+      audio.volume = volume.value;
+      audio.play();
+    }
   }
 };
 

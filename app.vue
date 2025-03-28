@@ -147,6 +147,7 @@ const soundList = {
   32: "haaa.ogg",
   33: "pof.ogg",
   34: "boss_spawn.ogg",
+  38: "glurps.ogg",
   42: "pof.ogg",
   45: "pacman.ogg",
   46: "pacman.ogg",

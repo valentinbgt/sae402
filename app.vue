@@ -207,14 +207,6 @@ const imageList = {
   95: "95.png",
 };
 
-const preloadImages = () => {
-  for (const key in imageList) {
-    const img = new Image();
-    img.src = `/img/${imageList[key]}`;
-    preloadedImages.value.push(img);
-  }
-};
-
 const preloadResources = async () => {
   const imageKeys = Object.keys(imageList);
   const soundKeys = Object.keys(soundList);
@@ -226,63 +218,98 @@ const preloadResources = async () => {
   totalResources.value =
     imageKeys.length + soundKeys.length + musicKeys.length + extraImages.length;
 
-  // Preload main images (slides)
+  // Create all loading promises in parallel
+  const loadPromises = [];
+
+  // Function to create a load promise for an image
+  const createImageLoadPromise = (src) => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.src = src;
+      img.onload = () => {
+        loadedResources.value++;
+        loadingProgress.value =
+          (loadedResources.value / totalResources.value) * 100;
+        resolve(img);
+      };
+      img.onerror = () => {
+        loadedResources.value++;
+        loadingProgress.value =
+          (loadedResources.value / totalResources.value) * 100;
+        resolve(null); // Resolve even on error, but with null
+      };
+    });
+  };
+
+  // Function to create a load promise for audio
+  const createAudioLoadPromise = (src) => {
+    return new Promise((resolve) => {
+      const audio = new Audio(src);
+      const onCanPlay = () => {
+        loadedResources.value++;
+        loadingProgress.value =
+          (loadedResources.value / totalResources.value) * 100;
+        resolve(audio);
+      };
+      audio.addEventListener("canplaythrough", onCanPlay, { once: true });
+      audio.addEventListener(
+        "error",
+        () => {
+          loadedResources.value++;
+          loadingProgress.value =
+            (loadedResources.value / totalResources.value) * 100;
+          resolve(null); // Resolve even on error, but with null
+        },
+        { once: true }
+      );
+      audio.load();
+    });
+  };
+
+  // Create all image load promises
   for (const key of imageKeys) {
-    const img = new Image();
-    img.src = `/img/${imageList[key]}`;
-    await new Promise((resolve) => {
-      img.onload = resolve;
-      img.onerror = resolve; // Continue even if some images fail to load
-    });
-    preloadedImages.value.push(img);
-    loadedResources.value++;
-    loadingProgress.value =
-      (loadedResources.value / totalResources.value) * 100;
+    const promise = createImageLoadPromise(`/img/${imageList[key]}`);
+    loadPromises.push(
+      promise.then((img) => {
+        if (img) preloadedImages.value.push(img);
+      })
+    );
   }
 
-  // Preload UI images
+  // Create UI image load promises
   for (const imgName of extraImages) {
-    const img = new Image();
-    img.src = `/img/${imgName}`;
-    await new Promise((resolve) => {
-      img.onload = resolve;
-      img.onerror = resolve;
-    });
-    loadedResources.value++;
-    loadingProgress.value =
-      (loadedResources.value / totalResources.value) * 100;
+    const promise = createImageLoadPromise(`/img/${imgName}`);
+    loadPromises.push(
+      promise.then((img) => {
+        if (img) preloadedImages.value.push(img);
+      })
+    );
   }
 
-  // Preload sound effects
+  // Create sound effect load promises
   for (const key of soundKeys) {
-    const audio = new Audio(`/sounds/${soundList[key]}`);
-    await new Promise((resolve) => {
-      audio.addEventListener("canplaythrough", resolve, { once: true });
-      audio.addEventListener("error", resolve, { once: true });
-      // Force loading to start
-      audio.load();
-    });
-    preloadedAudio.value.push(audio);
-    loadedResources.value++;
-    loadingProgress.value =
-      (loadedResources.value / totalResources.value) * 100;
+    const promise = createAudioLoadPromise(`/sounds/${soundList[key]}`);
+    loadPromises.push(
+      promise.then((audio) => {
+        if (audio) preloadedAudio.value.push(audio);
+      })
+    );
   }
 
-  // Preload music tracks
+  // Create music track load promises
   for (const key of musicKeys) {
-    const audio = new Audio(`/sounds/${musicList[key]}`);
-    await new Promise((resolve) => {
-      audio.addEventListener("canplaythrough", resolve, { once: true });
-      audio.addEventListener("error", resolve, { once: true });
-      // Force loading to start
-      audio.load();
-    });
-    preloadedAudio.value.push(audio);
-    loadedResources.value++;
-    loadingProgress.value =
-      (loadedResources.value / totalResources.value) * 100;
+    const promise = createAudioLoadPromise(`/sounds/${musicList[key]}`);
+    loadPromises.push(
+      promise.then((audio) => {
+        if (audio) preloadedAudio.value.push(audio);
+      })
+    );
   }
 
+  // Wait for all resources to load in parallel
+  await Promise.all(loadPromises);
+
+  // All resources loaded
   loading.value = false;
 };
 

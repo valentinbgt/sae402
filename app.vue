@@ -188,6 +188,7 @@ const soundList = {
   77: "pof.ogg",
   82: "thanos_snap.ogg",
   83: "hum.ogg",
+  87: "eh.ogg",
   88: "wilhelm.ogg",
   r_key: "rot.ogg",
 };
@@ -200,7 +201,8 @@ const musicList = {
   62: "herobrine.ogg",
   63: "STOP",
   64: "minecraft.ogg",
-  67: "minecraft.ogg",
+  66: "minecraft.ogg",
+  67: "STOP",
   68: "dernier_boss.ogg",
   82: "dernier_boss.ogg",
   83: "fin.ogg",

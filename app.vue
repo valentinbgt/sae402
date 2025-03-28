@@ -1,72 +1,102 @@
 <template>
   <div class="flex items-center justify-center h-screen bg-gray-900 relative">
-    <!-- Volume control in top right -->
-    <div class="absolute top-4 right-4 flex items-center">
-      <span class="text-white mr-2">Volume</span>
-      <input
-        type="range"
-        min="0"
-        max="1"
-        step="0.01"
-        v-model="volume"
-        @input="updateVolume"
-        class="w-32"
-      />
-    </div>
-
-    <img
-      src="/img/pierre_deter.png"
-      class="absolute bottom-0 left-0 w-60 hidden lg:block"
-      alt=""
-    />
-
-    <img
-      src="/img/perso1_decor.png"
-      class="absolute bottom-0 right-0 w-60 md:w-80"
-      alt=""
-    />
-
+    <!-- Loading screen -->
     <div
-      class="absolute bottom-4 left-0 right-0 justify-center hidden min-[900px]:flex"
+      v-if="loading"
+      class="fixed inset-0 bg-gray-900 flex flex-col items-center justify-center z-50"
     >
-      <img src="/img/titre_bd.png" class="w-96" alt="" />
-    </div>
-
-    <div
-      id="container"
-      class="h-3/5 aspect-square flex items-center justify-center relative"
-      style="max-width: 100vw"
-    >
-      <img
-        id="mainImage"
-        :src="'/img/' + imageList[index]"
-        class="h-full w-full object-contain"
-      />
-      <div class="absolute h-full aspect-square">
+      <h1 class="text-4xl text-white mb-6 font-bold">Loading...</h1>
+      <div class="w-64 h-4 bg-gray-700 rounded-full overflow-hidden">
         <div
-          @click="tryPrevious()"
-          class="h-full w-1/2 inline-block prev-cursor"
-          style="color: rgba(255, 0, 0, 0.5)"
-        ></div>
-        <div
-          @click="tryNext()"
-          class="h-full w-1/2 inline-block next-cursor"
-          style="color: rgba(0, 0, 255, 0.5)"
+          class="h-full bg-blue-500 transition-all duration-300"
+          :style="{ width: `${loadingProgress}%` }"
         ></div>
       </div>
+      <p class="text-white mt-4">
+        {{ Math.round(loadingProgress) }}% ({{ loadedResources }}/{{
+          totalResources
+        }})
+      </p>
     </div>
+
+    <!-- Game content -->
+    <template v-else>
+      <!-- Volume control in top right -->
+      <div class="absolute top-4 right-4 flex items-center">
+        <span class="text-white mr-2">Volume</span>
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          v-model="volume"
+          @input="updateVolume"
+          class="w-32"
+        />
+      </div>
+
+      <img
+        src="/img/pierre_deter.png"
+        class="absolute bottom-0 left-0 w-60 hidden lg:block"
+        alt=""
+      />
+
+      <img
+        src="/img/perso1_decor.png"
+        class="absolute bottom-0 right-0 w-60 md:w-80"
+        alt=""
+      />
+
+      <div
+        class="absolute bottom-4 left-0 right-0 justify-center hidden min-[900px]:flex"
+      >
+        <img src="/img/titre_bd.png" class="w-96" alt="" />
+      </div>
+
+      <div
+        id="container"
+        class="h-3/5 aspect-square flex items-center justify-center relative"
+        style="max-width: 100vw"
+      >
+        <img
+          id="mainImage"
+          :src="'/img/' + imageList[index]"
+          class="h-full w-full object-contain"
+        />
+        <div class="absolute h-full aspect-square">
+          <div
+            @click="tryPrevious()"
+            class="h-full w-1/2 inline-block prev-cursor"
+            style="color: rgba(255, 0, 0, 0.5)"
+          ></div>
+          <div
+            @click="tryNext()"
+            class="h-full w-1/2 inline-block next-cursor"
+            style="color: rgba(0, 0, 255, 0.5)"
+          ></div>
+        </div>
+      </div>
+    </template>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, watch, nextTick } from "vue";
 
 const index = ref(1);
 const preloadedImages = ref([]);
+const preloadedAudio = ref([]);
 const volume = ref(1); // Default volume is 100%
 const currentMusic = ref(null);
 const MUSIC_VOLUME_MULTIPLIER = 0.3; // Music plays at 50% of master volume
 
+// Loading screen variables
+const loading = ref(true);
+const loadingProgress = ref(0);
+const loadedResources = ref(0);
+const totalResources = ref(0);
+
+// Resources to preload
 const soundList = {
   45: "pacman.mp3",
   46: "pacman.mp3",
@@ -183,6 +213,77 @@ const preloadImages = () => {
     img.src = `/img/${imageList[key]}`;
     preloadedImages.value.push(img);
   }
+};
+
+const preloadResources = async () => {
+  const imageKeys = Object.keys(imageList);
+  const soundKeys = Object.keys(soundList);
+  const musicKeys = Object.keys(musicList);
+
+  // Add extra UI images to preload
+  const extraImages = ["pierre_deter.png", "perso1_decor.png", "titre_bd.png"];
+
+  totalResources.value =
+    imageKeys.length + soundKeys.length + musicKeys.length + extraImages.length;
+
+  // Preload main images (slides)
+  for (const key of imageKeys) {
+    const img = new Image();
+    img.src = `/img/${imageList[key]}`;
+    await new Promise((resolve) => {
+      img.onload = resolve;
+      img.onerror = resolve; // Continue even if some images fail to load
+    });
+    preloadedImages.value.push(img);
+    loadedResources.value++;
+    loadingProgress.value =
+      (loadedResources.value / totalResources.value) * 100;
+  }
+
+  // Preload UI images
+  for (const imgName of extraImages) {
+    const img = new Image();
+    img.src = `/img/${imgName}`;
+    await new Promise((resolve) => {
+      img.onload = resolve;
+      img.onerror = resolve;
+    });
+    loadedResources.value++;
+    loadingProgress.value =
+      (loadedResources.value / totalResources.value) * 100;
+  }
+
+  // Preload sound effects
+  for (const key of soundKeys) {
+    const audio = new Audio(`/sounds/${soundList[key]}`);
+    await new Promise((resolve) => {
+      audio.addEventListener("canplaythrough", resolve, { once: true });
+      audio.addEventListener("error", resolve, { once: true });
+      // Force loading to start
+      audio.load();
+    });
+    preloadedAudio.value.push(audio);
+    loadedResources.value++;
+    loadingProgress.value =
+      (loadedResources.value / totalResources.value) * 100;
+  }
+
+  // Preload music tracks
+  for (const key of musicKeys) {
+    const audio = new Audio(`/sounds/${musicList[key]}`);
+    await new Promise((resolve) => {
+      audio.addEventListener("canplaythrough", resolve, { once: true });
+      audio.addEventListener("error", resolve, { once: true });
+      // Force loading to start
+      audio.load();
+    });
+    preloadedAudio.value.push(audio);
+    loadedResources.value++;
+    loadingProgress.value =
+      (loadedResources.value / totalResources.value) * 100;
+  }
+
+  loading.value = false;
 };
 
 const tryNext = () => {
@@ -317,24 +418,38 @@ const checkAndUpdateMusic = () => {
   }
 };
 
-onMounted(() => {
-  preloadImages();
-
-  window.addEventListener("keydown", handleKeyPress);
-
+// Initialize game elements after loading is complete
+const initializeGameElements = () => {
   const container = document.getElementById("container");
+  if (container) {
+    container.addEventListener("click", () => {
+      return;
+      if (!document.fullscreenElement) {
+        container.requestFullscreen().catch((err) => {
+          console.log(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+      } else {
+        document.exitFullscreen();
+      }
+    });
+  }
 
-  container.addEventListener("click", () => {
-    return;
-    if (!document.fullscreenElement) {
-      container.requestFullscreen().catch((err) => {
-        console.log(`Error attempting to enable fullscreen: ${err.message}`);
-      });
-    } else {
-      document.exitFullscreen();
-    }
-  });
   checkAndUpdateMusic();
+};
+
+// Watch for loading to complete, then initialize game elements
+watch(loading, (newValue) => {
+  if (newValue === false) {
+    // Wait for DOM to update before accessing elements
+    nextTick(() => {
+      initializeGameElements();
+    });
+  }
+});
+
+onMounted(() => {
+  preloadResources();
+  window.addEventListener("keydown", handleKeyPress);
 });
 
 onUnmounted(() => {

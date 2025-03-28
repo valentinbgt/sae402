@@ -307,6 +307,7 @@ const imageList = {
   94: "94.webp",
   95: "95.webp",
   96: "96.webp",
+  97: "97.webp",
 };
 
 const toggleMusic = () => {

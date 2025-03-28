@@ -37,18 +37,26 @@
 
     <!-- Game content -->
     <template v-else>
-      <!-- Volume control in top right -->
-      <div class="absolute top-4 right-4 flex items-center">
-        <span class="text-white mr-2">Volume</span>
-        <input
-          type="range"
-          min="0"
-          max="1"
-          step="0.01"
-          v-model="volume"
-          @input="updateVolume"
-          class="w-32"
-        />
+      <!-- Volume and music controls in top right -->
+      <div class="absolute top-4 right-4 flex items-center space-x-4">
+        <div class="flex items-center">
+          <span class="text-white mr-2">Volume</span>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            v-model="volume"
+            @input="updateVolume"
+            class="w-32"
+          />
+        </div>
+        <button
+          @click="toggleMusic"
+          class="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-white"
+        >
+          Musique: {{ musicMuted ? "OFF" : "ON" }}
+        </button>
       </div>
 
       <img
@@ -56,19 +64,16 @@
         class="absolute bottom-0 left-0 w-60 hidden lg:block"
         alt=""
       />
-
       <img
         src="/img/perso1_decor.png"
         class="absolute bottom-0 right-0 w-60 md:w-80"
         alt=""
       />
-
       <div
         class="absolute bottom-4 left-0 right-0 justify-center hidden min-[900px]:flex"
       >
         <img src="/img/titre_bd.png" class="w-96" alt="" />
       </div>
-
       <div
         id="container"
         class="h-3/5 aspect-square flex items-center justify-center relative"
@@ -98,17 +103,23 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, watch, nextTick } from "vue";
-
 const index = ref(1);
 const preloadedImages = ref([]);
 const preloadedAudio = ref([]);
 // Initialize volume with proper browser check
 const volume = ref(1); // Default to 1
+// Add music mute state with localStorage persistence
+const musicMuted = ref(false); // Default to not muted
 // Check if code is running in browser before accessing localStorage
 if (process.client) {
   const savedVolume = localStorage.getItem("masterVolume");
   if (savedVolume !== null) {
     volume.value = parseFloat(savedVolume);
+  }
+
+  const savedMusicState = localStorage.getItem("musicMuted");
+  if (savedMusicState !== null) {
+    musicMuted.value = savedMusicState === "true";
   }
 }
 const currentMusic = ref(null);
@@ -239,20 +250,36 @@ const imageList = {
   95: "95.png",
 };
 
+// Toggle music on/off
+const toggleMusic = () => {
+  musicMuted.value = !musicMuted.value;
+
+  // Save the music setting to localStorage
+  if (process.client) {
+    localStorage.setItem("musicMuted", musicMuted.value.toString());
+  }
+
+  // If turning music off, fade out current music
+  if (musicMuted.value && currentMusic.value) {
+    fadeOut(currentMusic.value);
+    currentMusic.value = null;
+  }
+  // If turning music on, start playing the appropriate music for the current slide
+  else if (!musicMuted.value && musicList[index.value]) {
+    playMusic(musicList[index.value]);
+  }
+};
+
 const preloadResources = async () => {
   const imageKeys = Object.keys(imageList);
   const soundKeys = Object.keys(soundList);
   const musicKeys = Object.keys(musicList);
-
   // Add extra UI images to preload
   const extraImages = ["pierre_deter.png", "perso1_decor.png", "titre_bd.png"];
-
   totalResources.value =
     imageKeys.length + soundKeys.length + musicKeys.length + extraImages.length;
-
   // Create all loading promises in parallel
   const loadPromises = [];
-
   // Function to create a load promise for an image
   const createImageLoadPromise = (src) => {
     return new Promise((resolve) => {
@@ -272,7 +299,6 @@ const preloadResources = async () => {
       };
     });
   };
-
   // Function to create a load promise for audio
   const createAudioLoadPromise = (src) => {
     return new Promise((resolve) => {
@@ -297,7 +323,6 @@ const preloadResources = async () => {
       audio.load();
     });
   };
-
   // Create all image load promises
   for (const key of imageKeys) {
     const promise = createImageLoadPromise(`/img/${imageList[key]}`);
@@ -307,7 +332,6 @@ const preloadResources = async () => {
       })
     );
   }
-
   // Create UI image load promises
   for (const imgName of extraImages) {
     const promise = createImageLoadPromise(`/img/${imgName}`);
@@ -317,7 +341,6 @@ const preloadResources = async () => {
       })
     );
   }
-
   // Create sound effect load promises
   for (const key of soundKeys) {
     const promise = createAudioLoadPromise(`/sounds/${soundList[key]}`);
@@ -327,7 +350,6 @@ const preloadResources = async () => {
       })
     );
   }
-
   // Create music track load promises
   for (const key of musicKeys) {
     const promise = createAudioLoadPromise(`/sounds/${musicList[key]}`);
@@ -337,10 +359,8 @@ const preloadResources = async () => {
       })
     );
   }
-
   // Wait for all resources to load in parallel
   await Promise.all(loadPromises);
-
   // All resources loaded
   loading.value = false;
 };
@@ -355,7 +375,6 @@ const tryNext = () => {
       audio.volume = volume.value;
       audio.play();
     }
-
     // Only check and update music if game has started
     if (gameStarted.value) {
       checkAndUpdateMusic();
@@ -398,17 +417,17 @@ const toggleFullscreen = () => {
 
 // Music handling functions
 const playMusic = (musicFile) => {
+  // Don't play music if it's muted
+  if (musicMuted.value) return;
+
   // Create a new audio element for the music
   const newMusic = new Audio(`/sounds/${musicFile}`);
   newMusic.loop = true;
   newMusic.volume = 0; // Start at 0 volume for fade in effect
-
   // Apply current volume setting - music plays at multiplier of master volume
   const targetVolume = volume.value * MUSIC_VOLUME_MULTIPLIER;
-
   // Start playing the new music immediately
   newMusic.play();
-
   // If there's already music playing, fade it out while fading in the new one simultaneously
   if (currentMusic.value) {
     fadeOut(currentMusic.value);
@@ -418,7 +437,6 @@ const playMusic = (musicFile) => {
     // If no music was playing, just fade in the new one
     fadeIn(newMusic, targetVolume);
   }
-
   // Update the current music reference
   currentMusic.value = newMusic;
 };
@@ -426,11 +444,9 @@ const playMusic = (musicFile) => {
 const fadeIn = (audioElement, targetVolume) => {
   let currentVol = 0;
   audioElement.volume = currentVol;
-
   // Calculate step size for a 2-second fade (20 steps)
   const stepSize = targetVolume / 20;
   const stepTime = 100; // 100ms per step = 2 seconds total
-
   const fadeInterval = setInterval(() => {
     currentVol += stepSize;
     if (currentVol >= targetVolume) {
@@ -443,11 +459,9 @@ const fadeIn = (audioElement, targetVolume) => {
 
 const fadeOut = (audioElement) => {
   let currentVol = audioElement.volume;
-
   // Calculate step size for a 2-second fade (20 steps)
   const stepSize = currentVol / 20;
   const stepTime = 100; // 100ms per step = 2 seconds total
-
   return new Promise((resolve) => {
     const fadeInterval = setInterval(() => {
       currentVol -= stepSize;
@@ -465,8 +479,8 @@ const fadeOut = (audioElement) => {
 
 // Update the volume control for all audio
 const updateVolume = () => {
-  if (currentMusic.value) {
-    // Music plays at 50% of master volume
+  if (currentMusic.value && !musicMuted.value) {
+    // Music plays at 30% of master volume
     currentMusic.value.volume = volume.value * MUSIC_VOLUME_MULTIPLIER;
   }
   // Store the updated volume in localStorage with browser check
@@ -477,9 +491,11 @@ const updateVolume = () => {
 
 // Check if we need to change music for the current image
 const checkAndUpdateMusic = () => {
+  // Skip music updates if music is muted
+  if (musicMuted.value) return;
+
   if (musicList[index.value]) {
     const newMusicFile = musicList[index.value];
-
     // If there's no current music playing or it's a different track, play the new music
     if (!currentMusic.value || !currentMusic.value.src.includes(newMusicFile)) {
       playMusic(newMusicFile);
@@ -503,7 +519,6 @@ const initializeGameElements = () => {
       }
     });
   }
-
   // Only check and update music if the game has started
   if (gameStarted.value) {
     checkAndUpdateMusic();
@@ -513,14 +528,12 @@ const initializeGameElements = () => {
 // Start the game
 const startGame = () => {
   gameStarted.value = true;
-
   // Wait for DOM to update before playing music
   nextTick(() => {
-    // Play the initial music for the first slide
-    if (musicList[index.value]) {
+    // Play the initial music for the first slide only if music is not muted
+    if (!musicMuted.value && musicList[index.value]) {
       playMusic(musicList[index.value]);
     }
-
     // Initialize the game UI elements
     initializeGameElements();
   });
@@ -545,6 +558,15 @@ onUnmounted(() => {
   window.removeEventListener("keydown", handleKeyPress);
 });
 </script>
+
+<style>
+.next-cursor {
+  cursor: url("/icons/arrow_forward.png") 0 0, auto;
+}
+.prev-cursor {
+  cursor: url("/icons/arrow_back.png") 0 0, auto;
+}
+</style>
 
 <style>
 .next-cursor {

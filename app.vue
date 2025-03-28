@@ -22,7 +22,7 @@
 
     <div
       v-else-if="!gameStarted"
-      class="fixed inset-0 bg-gray-900 flex flex-col items-center justify-center z-50 cursor-pointer"
+      class="fixed inset-0 bg-gray-900 flex flex-col items-center justify-center z-50 cursor-pointer transition-opacity duration-500"
       @click="startGame"
     >
       <h1 class="text-4xl text-white mb-6 font-bold">
@@ -34,63 +34,71 @@
     </div>
 
     <template v-else>
-      <div class="absolute top-4 right-4 flex items-center space-x-4">
-        <div class="items-center hidden md:flex">
-          <span class="text-white mr-2">Volume</span>
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            v-model="volume"
-            @input="updateVolume"
-            class="w-32"
-          />
+      <div
+        class="game-container transition-opacity duration-500"
+        :class="{
+          'opacity-0': gameStartTransition,
+          'opacity-100': !gameStartTransition,
+        }"
+      >
+        <div class="absolute top-4 right-4 flex items-center space-x-4">
+          <div class="items-center hidden md:flex">
+            <span class="text-white mr-2">Volume</span>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              v-model="volume"
+              @input="updateVolume"
+              class="w-32"
+            />
+          </div>
+          <button
+            @click="toggleMusic"
+            class="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-white"
+          >
+            Musique: {{ musicMuted ? "OFF" : "ON" }}
+          </button>
         </div>
-        <button
-          @click="toggleMusic"
-          class="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-white"
-        >
-          Musique: {{ musicMuted ? "OFF" : "ON" }}
-        </button>
-      </div>
 
-      <img
-        src="/img/pierre_deter.webp"
-        class="absolute bottom-0 left-0 w-60 hidden lg:block"
-        alt=""
-      />
-      <img
-        src="/img/perso1_decor.webp"
-        class="absolute bottom-0 right-0 w-60 md:w-80"
-        alt=""
-      />
-      <div
-        class="absolute bottom-4 left-0 right-0 justify-center hidden min-[900px]:flex"
-      >
-        <img src="/img/titre_bd.webp" class="w-96" alt="" />
-      </div>
-      <div
-        id="container"
-        class="h-3/5 aspect-square flex items-center justify-center relative"
-        style="max-width: 100vw"
-      >
         <img
-          id="mainImage"
-          :src="'/img/' + imageList[index]"
-          class="h-full w-full object-contain"
+          src="/img/pierre_deter.webp"
+          class="absolute bottom-0 left-0 w-60 hidden lg:block"
+          alt=""
         />
-        <div class="absolute h-full aspect-square">
-          <div
-            @click="tryPrevious()"
-            class="h-full w-1/2 inline-block prev-cursor"
-            style="color: rgba(255, 0, 0, 0.5)"
-          ></div>
-          <div
-            @click="tryNext()"
-            class="h-full w-1/2 inline-block next-cursor"
-            style="color: rgba(0, 0, 255, 0.5)"
-          ></div>
+        <img
+          src="/img/perso1_decor.webp"
+          class="absolute bottom-0 right-0 w-60 md:w-80"
+          alt=""
+        />
+        <div
+          class="absolute bottom-4 left-0 right-0 justify-center hidden min-[900px]:flex"
+        >
+          <img src="/img/titre_bd.webp" class="w-96" alt="" />
+        </div>
+        <div
+          id="container"
+          class="h-3/5 aspect-square flex items-center justify-center relative"
+          style="max-width: 100vw"
+        >
+          <img
+            id="mainImage"
+            :src="'/img/' + imageList[index]"
+            class="h-full w-full object-contain"
+          />
+          <div class="absolute h-full aspect-square">
+            <div
+              @click="tryPrevious()"
+              class="h-full w-1/2 inline-block prev-cursor"
+              style="color: rgba(255, 0, 0, 0.5)"
+            ></div>
+            <div
+              @click="tryNext()"
+              class="h-full w-1/2 inline-block next-cursor"
+              style="color: rgba(0, 0, 255, 0.5)"
+            ></div>
+          </div>
         </div>
       </div>
     </template>
@@ -131,6 +139,7 @@ const loadingProgress = ref(0);
 const loadedResources = ref(0);
 const totalResources = ref(0);
 const gameStarted = ref(false);
+const gameStartTransition = ref(true); // Added for transition control
 
 const soundList = {
   2: "piouf.ogg",
@@ -531,11 +540,20 @@ const initializeGameElements = () => {
 
 const startGame = () => {
   gameStarted.value = true;
+  // Start with the game interface invisible
+  gameStartTransition.value = true;
+
   nextTick(() => {
+    // Begin playing music if available
     if (!musicMuted.value && musicList[index.value]) {
       playMusic(musicList[index.value]);
     }
     initializeGameElements();
+
+    // After a small delay, set transition to false to fade in the game interface
+    setTimeout(() => {
+      gameStartTransition.value = false;
+    }, 100);
   });
 };
 
@@ -563,6 +581,21 @@ onUnmounted(() => {
 }
 .prev-cursor {
   cursor: url("/icons/arrow_back.png") 0 0, auto;
+}
+
+.game-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* Add fade-in/fade-out transitions */
+.transition-opacity {
+  transition: opacity 5s ease-in-out;
 }
 </style>
 

@@ -340,21 +340,28 @@ const preloadResources = async () => {
 const tryNext = () => {
   if (index.value < Object.keys(imageList).length) {
     index.value++;
-    // Play sound if there's one associated with this image
-    if (soundList[index.value]) {
+    // Play sound if there's one associated with this image and game has started
+    if (gameStarted.value && soundList[index.value]) {
       const audio = new Audio(`/sounds/${soundList[index.value]}`);
       // Apply master volume control to sounds (100% of master volume)
       audio.volume = volume.value;
       audio.play();
     }
-    checkAndUpdateMusic();
+
+    // Only check and update music if game has started
+    if (gameStarted.value) {
+      checkAndUpdateMusic();
+    }
   }
 };
 
 const tryPrevious = () => {
   if (index.value > 1) {
     index.value--;
-    checkAndUpdateMusic();
+    // Only check and update music if game has started
+    if (gameStarted.value) {
+      checkAndUpdateMusic();
+    }
   }
 };
 
@@ -485,7 +492,10 @@ const initializeGameElements = () => {
     });
   }
 
-  checkAndUpdateMusic();
+  // Only check and update music if the game has started
+  if (gameStarted.value) {
+    checkAndUpdateMusic();
+  }
 };
 
 // Start the game

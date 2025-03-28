@@ -104,7 +104,7 @@ useHead({
   title: "Michel et l'anneau",
 });
 
-const index = ref(1);
+const index = ref(0);
 const preloadedImages = ref([]);
 const preloadedAudio = ref([]);
 
@@ -178,6 +178,7 @@ const musicList = {
 };
 
 const imageList = {
+  0: "0.webp",
   1: "1.webp",
   2: "2.webp",
   3: "3.webp",
@@ -395,7 +396,7 @@ const tryNext = () => {
 };
 
 const tryPrevious = () => {
-  if (index.value > 1) {
+  if (index.value > 0) {
     index.value--;
     if (gameStarted.value) {
       checkAndUpdateMusic();

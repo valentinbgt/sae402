@@ -19,6 +19,18 @@
       </p>
     </div>
 
+    <!-- Click to play screen -->
+    <div
+      v-else-if="!gameStarted"
+      class="fixed inset-0 bg-gray-900 flex flex-col items-center justify-center z-50 cursor-pointer"
+      @click="startGame"
+    >
+      <h1 class="text-4xl text-white mb-6 font-bold">Click on the screen to play</h1>
+      <div class="text-white text-opacity-70 text-xl mt-4 animate-pulse">
+        Click anywhere to continue
+      </div>
+    </div>
+
     <!-- Game content -->
     <template v-else>
       <!-- Volume control in top right -->
@@ -95,6 +107,7 @@ const loading = ref(true);
 const loadingProgress = ref(0);
 const loadedResources = ref(0);
 const totalResources = ref(0);
+const gameStarted = ref(false);
 
 // Resources to preload
 const soundList = {
@@ -462,6 +475,22 @@ const initializeGameElements = () => {
   }
 
   checkAndUpdateMusic();
+};
+
+// Start the game
+const startGame = () => {
+  gameStarted.value = true;
+  
+  // Wait for DOM to update before playing music
+  nextTick(() => {
+    // Play the initial music for the first slide
+    if (musicList[index.value]) {
+      playMusic(musicList[index.value]);
+    }
+    
+    // Initialize the game UI elements
+    initializeGameElements();
+  });
 };
 
 // Watch for loading to complete, then initialize game elements

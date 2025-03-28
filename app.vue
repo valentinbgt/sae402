@@ -39,7 +39,7 @@
     <template v-else>
       <!-- Volume and music controls in top right -->
       <div class="absolute top-4 right-4 flex items-center space-x-4">
-        <div class="flex items-center">
+        <div class="items-center hidden md:flex">
           <span class="text-white mr-2">Volume</span>
           <input
             type="range"
@@ -425,6 +425,9 @@ const tryPrevious = () => {
 };
 
 const handleKeyPress = (event) => {
+  // Only process keyboard inputs if the game has started
+  if (!gameStarted.value) return;
+
   if (event.key === "ArrowLeft") {
     tryPrevious();
   }

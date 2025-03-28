@@ -134,9 +134,15 @@ const gameStarted = ref(false);
 
 // Resources to preload
 const soundList = {
+  5: "coup_de_poing.ogg",
   19: "pof.ogg",
   25: "pof.ogg",
   27: "pof.ogg",
+  28: "ka.ogg",
+  29: "me.ogg",
+  30: "ha.ogg",
+  31: "me2.ogg",
+  32: "haaa.ogg",
   34: "pof.ogg",
   42: "pof.ogg",
   45: "pacman.mp3",
@@ -248,6 +254,7 @@ const imageList = {
   93: "93.png",
   94: "94.png",
   95: "95.png",
+  96: "96.png",
 };
 
 // Toggle music on/off

@@ -152,7 +152,7 @@ const soundList = {
   47: "pacman.ogg",
   63: "pof.ogg",
   76: "pof.ogg",
-  "r_key": "rot.ogg",
+  r_key: "rot.ogg",
 };
 
 const musicList = {

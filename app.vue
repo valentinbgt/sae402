@@ -105,7 +105,7 @@
 import { ref, onMounted, onUnmounted, watch, nextTick } from "vue";
 // Define the page title
 useHead({
-  title: "Metaring",
+  title: "Michel et l'anneau",
 });
 
 const index = ref(1);

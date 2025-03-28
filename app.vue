@@ -16,7 +16,7 @@
 
     <img
       src="/img/pierre_deter.png"
-      class="absolute bottom-0 left-0 w-60"
+      class="absolute bottom-0 left-0 w-60 hidden lg:block"
       alt=""
     />
 
@@ -26,16 +26,22 @@
       alt=""
     />
 
-    <div class="absolute bottom-4 left-0 right-0 flex justify-center">
+    <div
+      class="absolute bottom-4 left-0 right-0 justify-center hidden min-[900px]:flex"
+    >
       <img src="/img/titre_bd.png" class="w-96" alt="" />
     </div>
 
     <div
       id="container"
       class="h-3/5 aspect-square flex items-center justify-center relative"
-      style="max-width: 900px; min-width: 700px"
+      style="max-width: 100vw"
     >
-      <img id="mainImage" :src="'/img/' + imageList[index]" class="h-full" />
+      <img
+        id="mainImage"
+        :src="'/img/' + imageList[index]"
+        class="h-full w-full object-contain"
+      />
       <div class="absolute h-full aspect-square">
         <div
           @click="tryPrevious()"

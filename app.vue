@@ -162,6 +162,7 @@ const soundList = {
   75: "transfo2.ogg",
   76: "transfo3.ogg",
   77: "pof.ogg",
+  82: "thanos_snap.ogg",
   83: "hum.ogg",
   88: "wilhelm.ogg",
   r_key: "rot.ogg",

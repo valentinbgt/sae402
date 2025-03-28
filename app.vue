@@ -25,7 +25,9 @@
       class="fixed inset-0 bg-gray-900 flex flex-col items-center justify-center z-50 cursor-pointer"
       @click="startGame"
     >
-      <h1 class="text-4xl text-white mb-6 font-bold">Click on the screen to play</h1>
+      <h1 class="text-4xl text-white mb-6 font-bold">
+        Click on the screen to play
+      </h1>
       <div class="text-white text-opacity-70 text-xl mt-4 animate-pulse">
         Click anywhere to continue
       </div>
@@ -480,14 +482,14 @@ const initializeGameElements = () => {
 // Start the game
 const startGame = () => {
   gameStarted.value = true;
-  
+
   // Wait for DOM to update before playing music
   nextTick(() => {
     // Play the initial music for the first slide
     if (musicList[index.value]) {
       playMusic(musicList[index.value]);
     }
-    
+
     // Initialize the game UI elements
     initializeGameElements();
   });
